@@ -4,6 +4,8 @@ const morgan=require('morgan');
 const hostname='localhost';
 const port=3000;
 
+const dishRouter=require('./routes/dishRouter');
+
 const bodyParser=require('body-parser');
 const app=express(); // saying that the app is going to use the express node module
 
@@ -11,7 +13,12 @@ app.use(morgan('dev'));// development version- so it will print out additionalin
 
 app.use(bodyParser.json());// body od incoming req is added to the body of req object
 
+app.use('/dishes', dishRouter); // mounted the dishRouter at /dishes endpoint
+//app.use('/dishes/:dishID', dishRouter);
+
 //building up REST API support for /dishes endpoint
+
+/*
 app.all('/dishes', (req, res, next)=>
 {
   // no matter GET PUT POST DELETE, executed first
@@ -59,7 +66,7 @@ app.put('/dishes/:dishID', (req, res, next)=>{  //means modifying a specific dis
 app.delete('/dishes/:dishID', (req, res, next)=>{
   res.end('deleting the dish'+req.params.dishID); // dangerous operation, need admin privileges- will do it later
 });
-
+*/
 
 app.use(express.static(__dirname+'/public')) // tells express to serve static files
 // informing express to look at this specific folder
