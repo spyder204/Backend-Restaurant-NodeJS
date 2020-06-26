@@ -11,8 +11,7 @@ dishRouter.route('/')
   // no matter GET PUT POST DELETE, executed first
   res.statusCode=200; // modifying res obj  here and in next line
   res.setHeader('Content-type', 'text/plain'); // sending plain text replies to the client
-
-  next();
+next();
       // continues to look additional specs down below which matches /dishes endpoint
       // if we receive a GET req at /dishes endpoint, req and would be passed on down below
       // and app.get will be executed
@@ -33,7 +32,35 @@ dishRouter.route('/')
 })
 .delete((req, res, next)=>{
   res.end('deleting all the dishes'); // dangerous operation, need admin privileges- will do it later
+});
+///------------------------------------------------
+dishRouter.route('/:dishID')
+.all((req, res, next)=>     //no longer need endpoint /dishes
+{
+  // no matter GET PUT POST DELETE, executed first
+  res.statusCode=200; // modifying res obj  here and in next line
+  res.setHeader('Content-type', 'text/plain'); // sending plain text replies to the client
+  next();
 })
+
+.get((req, res, next)=>{ // res object modified in app.all is the parameter here
+  res.end(`will send the dish ${req.params.dishID} to you`);
+})
+
+.post((req, res, next)=>{  // runs after app.all if there is a POST require
+  res.statusCode=403; //means operation not supported on a particular dish
+  res.end('POST operation not supported on dishes');
+})
+
+.put((req, res, next)=>{  //means modifying a specific dish
+  //res.statusCode=403; //means operation not supported
+  res.write(`updating the dish ${req.params.dishID}\n`);// used to add a line to the reply message
+  res.end(`will update the dish ${req.body.name} with ${req.body.description}`);
+})
+
+.delete((req, res, next)=>{
+  res.end('deleting the dish'+req.params.dishID); // dangerous operation, need admin privileges- will do it later
+});
 
 
 
