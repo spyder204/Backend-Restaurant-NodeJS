@@ -1,5 +1,5 @@
 const express = require('express');
-const bodyParser=require('body-parser');
+const bodyParser = require('body-parser');
 
 const dishRouter=express.Router(); // dishRouter declared as an express Router
 
@@ -55,7 +55,7 @@ dishRouter.route('/:dishID')
 .put((req, res, next)=>{  //means modifying a specific dish
   //res.statusCode=403; //means operation not supported
   res.write(`updating the dish ${req.params.dishID}\n`);// used to add a line to the reply message
-  res.end(`will update the dish ${req.body.name} with ${req.body.description}`);
+  res.end(`will update the dish ID-  ${req.params.dishID}, ${req.body.name} with ${req.body.description}`);
 })
 
 .delete((req, res, next)=>{

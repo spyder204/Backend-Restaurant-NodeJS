@@ -5,6 +5,9 @@ const hostname='localhost';
 const port=3000;
 
 const dishRouter=require('./routes/dishRouter');
+const promoRouter=require('./routes/promoRouter');
+const leaderRouter=require('./routes/leaderRouter');
+
 
 const bodyParser=require('body-parser');
 const app=express(); // saying that the app is going to use the express node module
@@ -14,6 +17,8 @@ app.use(morgan('dev'));// development version- so it will print out additionalin
 app.use(bodyParser.json());// body od incoming req is added to the body of req object
 
 app.use('/dishes', dishRouter);
+app.use('/promotions', promoRouter);
+app.use('/leaders',leaderRouter);
 //app.use('/dishes/:dishID', dishRouter);
 
 // mounted the dishRouter at /dishes endpoint
