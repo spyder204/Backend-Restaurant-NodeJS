@@ -11,7 +11,7 @@ dishRouter.route('/')
   // no matter GET PUT POST DELETE, executed first
   res.statusCode=200; // modifying res obj  here and in next line
   res.setHeader('Content-type', 'text/plain'); // sending plain text replies to the client
-next();
+  next();
       // continues to look additional specs down below which matches /dishes endpoint
       // if we receive a GET req at /dishes endpoint, req and would be passed on down below
       // and app.get will be executed
@@ -52,8 +52,8 @@ dishRouter.route('/:dishID')
   res.end('POST operation not supported on dishes');
 })
 
-.put((req, res, next)=>{  //means modifying a specific dish
-  //res.statusCode=403; //means operation not supported
+.put((req, res, next)=>{
+
   res.write(`updating the dish ${req.params.dishID}\n`);// used to add a line to the reply message
   res.end(`will update the dish ID-  ${req.params.dishID}, ${req.body.name} with ${req.body.description}`);
 })

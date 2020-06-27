@@ -79,6 +79,7 @@ app.delete('/dishes/:dishID', (req, res, next)=>{
 app.use(express.static(__dirname+'/public')) // tells express to serve static files
 // informing express to look at this specific folder
 
+
 //setting up EXPRESS server using express methods
 app.use((req, res, next)=>   // next(optional)- is used when we use additional middleware
 {
@@ -88,10 +89,11 @@ app.use((req, res, next)=>   // next(optional)- is used when we use additional m
   res.end('<html><body><p>this is an express server</p></body></html>');
 
 });
+
 //setting up NODE HTTP server
 const server=http.createServer(app);
 
 server.listen(port, hostname,()=>{
   console.log(`server running at http://${hostname}:${port}`);
 });
-// by default- it will server the index.html file
+// by default- it will serve the index.html file
