@@ -14,26 +14,42 @@ connect.then((db)=>{
     
     //var newDish=Dishes
     Dishes.create({
-        name:'Chicken',
-        description:'test'
+        name: 'Uthappizza',
+        description: 'test'
     })
-    //Dishes.save()-- no need now
-    .then((dish)=>{
+    .then((dish) => {
         console.log(dish);
-        Dishes.find({}).exec();
-        //exec ensures that this will executed
-    })
-    .then((dishes)=>{
-        console.log(dishes);
-        console.log('removing dishes now');
-        return Dishes.remove({});// removes all the entries in the database
 
+        return Dishes.findByIdAndUpdate(dish._id, {
+            $set: { description: 'Updated test'}
+        },{ 
+            new: true 
+        })
+        .exec();
     })
-    .then(()=>{
+    .then((dish) => {
+        console.log(dish);
+
+        dish.comments.push({
+            rating: 5,
+            comment: 'I\'m getting a sinking feeling!',
+            author: 'Leonardo di Carpaccio'
+        });
+
+        return dish.save();
+    })
+    .then((dish) => {
+        console.log(dish);
+
+        return Dishes.remove({});
+    })
+    .then(() => {
         return mongoose.connection.close();
     })
-    .catch((err)=>{console.log(err);
-        });
+    .catch((err) => {
+        console.log(err);
+    });
+    
 });
 
 // 
