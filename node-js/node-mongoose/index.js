@@ -10,22 +10,29 @@ const connect = mongoose.connect(url);
 
 connect.then((db)=>{
     console.log('Connected to server');
-    var newDish=Dishes({
+    
+    
+    //var newDish=Dishes
+    Dishes.create({
         name:'Chicken',
         description:'test'
-    });
-    newDish.save().then((dish)=>{
+    })
+    //Dishes.save()-- no need now
+    .then((dish)=>{
         console.log(dish);
         Dishes.find({}).exec();
         //exec ensures that this will executed
-    }).then((dishes)=>{
+    })
+    .then((dishes)=>{
         console.log(dishes);
         console.log('removing dishes now');
         return Dishes.remove({});// removes all the entries in the database
 
-    }).then(()=>{
+    })
+    .then(()=>{
         return mongoose.connection.close();
-    }).catch((err)=>{console.log(err);
+    })
+    .catch((err)=>{console.log(err);
         });
 });
 
