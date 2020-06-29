@@ -1,48 +1,52 @@
 const mongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
-const db_oper=require('./operations');
+const dboper=require('./operations');
 
 // to start up a connection to mongoDB server
 const url = 'mongodb://localhost:27017/'; //port number
 const dbname='conFusion';// name of db  created using mongo shell
 
 // to access the  server
-mongoClient.connect(url, (err, client)=>{ // url, callback func
+mongoClient.connect(url).then((client) => {
 
-  assert.equal(err,null); // assert will check if the error is not null
-
-  console.log('Connection successful');
-
-  // connecting to the DB
+  console.log('Connected correctly to server');
   const db = client.db(dbname);
-  const collection = db.collection('dishes');
-//////////////
-// nested set of callbacks
 
-  db_oper.insertDocument(db, {name:"Vadonut", description:"test"}, 'dishes', (result)=>{
-    console.log('Insert document:\n', result.ops);
+  dboper.insertDocument(db, { name: "Vadonut", description: "Test"},
+      "dishes")
+      .then((result) => {
+          console.log("Insert Document:\n", result.ops);
 
-    db_oper.findDocuments(db, 'dishes', (docs)=>{
-      console.log('Found docs\n',docs);
+          return dboper.findDocuments(db, "dishes");
+      })
+      .then((docs) => {
+          console.log("Found Documents:\n", docs);
 
-      db_oper.updateDocument(db, {name:"Vadonut"}, {description: "updated test"}, 'dishes', (result)=>{
-        console.log('Updated document\n', result.result);
+          return dboper.updateDocument(db, { name: "Vadonut" },
+                  { description: "Updated Test" }, "dishes");
 
-        //find docs to delete
-        db_oper.findDocuments(db, 'dishes', (docs)=>{
-          console.log('Found docs- ',docs);
-          db.dropCollection('dishes', (result)=>{
-            console.log("Collection deleted ", result);
-            client.close();
+      })
+      .then((result) => {
+          console.log("Updated Document:\n", result.result);
 
-          });
+          return dboper.findDocuments(db, "dishes");
+      })
+      .then((docs) => {
+          console.log("Found Updated Documents:\n", docs);
+                          
+          return db.dropCollection("dishes");
+      })
+      .then((result) => {
+          console.log("Dropped Collection: ", result);
 
-          });
-      });
+          return client.close();
+      })
+      .catch((err) => console.log(err));
 
-  });
-});
+})
+.catch((err) => console.log(err));;
+//catching promises errors
 
 
 
@@ -74,4 +78,4 @@ ONE INSIDE THE OTHER
         });
     });
   });*/
-});  // url, callback func
+  // url, callback func
