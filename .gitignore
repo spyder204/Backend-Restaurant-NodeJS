@@ -1,6 +1,6 @@
 node-js/node-mongo/node_modules
 node-js/node-express/node_modules
-node-js/confusionServe/node_modules
+node-js/confusion_server/node_modules
 mongoDB
 node-js/node-mongoose/node_modules
 
