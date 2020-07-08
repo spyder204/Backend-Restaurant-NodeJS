@@ -55,6 +55,10 @@ app.use(session({
 
 }));
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
+//putting these before auth so any user can access the above two endpoints without being authenticated.
 
 function auth(req, res, next){     // authorization
     
@@ -66,65 +70,20 @@ function auth(req, res, next){     // authorization
   if(!req.session.user)  
   { // user has not been authorized yet if signed cookie doesn't contain the user property
     // so auth has to be done now
-    var authHeader = req.headers.authorization;
-
-    if(!authHeader){
-      var err = new Error('Authentication required!!');
-      //setting header in the response msg
-      res.setHeader('WWW-Authenticate','Basic');
-      err.status=401;// unauthorized access
-      return next(err); // will be handled by the handler down below
+    var err=new Error('You are not authenticated!');
+    err.status=403;
+    return next(err);
   
-    }
-  
-    // if the auth header exists..we'll extract it
-    //we'll split the header- it's a string basically- using buffer
-    // split function se array milegi, uska index=1 chahye
-  
-    var auth=new Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    /* split function se array milegi, uska index=1 chahye --- index=0 pe 'base' ya 'basic' h shayd
-        fir index=1 wla buffer mein convert kra
-        jo array mili thi usme name, password hoga separated by a semicolon
-        toh semicolon pe firse split mara
-  
-        so the variable auth is an array 
-        */
-    var username=auth[0]; 
-    var password=auth[1]; 
-  
-    if(username==='admin' && password==='password'){
-      // instead of setting up the cookie, we'll use session.user
-      req.session.user='admin';
-      
-      //----------
-      // we'll setup the cookie at this point  
-      //res.cookie('user','admin',{signed:true})// cookie name=user-- that is why checking for req.signedCookies.user up there
-      //                  ^ user field set to admin
-
-      next(); // from here req will be passed on to the next middleware
-      
-    }
-    else{
-      var err = new Error('Authentication required!!');
-      //setting header in the response msg
-      res.setHeader('WWW-Authenticate','Basic');
-      err.status=401;// unauthorized access
-      return next(err); // will be handled by the handler down below
-  
-    }
-  
-
-  }//req.signed
-
+  } 
   else{  // means the signed cookie already exists
 
-    if(req.session.user==='admin'){ 
+    if(req.session.user==='authenticated'){  // in users.js- line 99-we have set it to authn.
       next();
     }
     else{
-      let err = new Error('Authentication required!!');
+      let err = new Error('You are not authenticated!');
       //setting header in the response msg
-      err.status=401;// unauthorized access
+      err.status=403;// 
       return next(err); // will be handled by the handler down below
 
     }
@@ -140,8 +99,7 @@ app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));// to serve static data from public folder
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
