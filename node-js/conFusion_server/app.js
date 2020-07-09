@@ -20,6 +20,9 @@ const Dishes = require('./models/dishes');
 const url = 'mongodb://localhost:27017/conFusion';
 const connect = mongoose.connect(url);// established
 
+const passport = require('passport');
+var authenticate =require('./authenticate');
+
 connect.then((db) => {
   console.log('Connected!');
 
@@ -33,8 +36,6 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
-
 
 
 app.use(logger('dev'));
@@ -54,6 +55,8 @@ app.use(session({
   store:new fileStore()
 
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -62,34 +65,16 @@ app.use('/users', usersRouter);
 
 function auth(req, res, next){     // authorization
     
-  //session middleware adds req.session to the request message
-  console.log(req.session);
-  
-  //console.log(req.signedCookies);
-  //console.log('\nHeaders',req.headers);
-  if(!req.session.user)  
-  { // user has not been authorized yet if signed cookie doesn't contain the user property
-    // so auth has to be done now
+  if(!req.user)  // loaded in by the passport sesssion middleware automatically
+  { 
     var err=new Error('You are not authenticated!');
     err.status=403;
     return next(err);
   
   } 
   else{  // means the signed cookie already exists
-
-    if(req.session.user==='authenticated'){  // in users.js- line 99-we have set it to authn.
-      next();
+    next();
     }
-    else{
-      let err = new Error('You are not authenticated!');
-      //setting header in the response msg
-      err.status=403;// 
-      return next(err); // will be handled by the handler down below
-
-    }
-
-
-  }
 
 
 }

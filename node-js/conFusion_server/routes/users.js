@@ -1,7 +1,8 @@
 var express  = require('express');
-
+const passport = require('passport');
 const bodyParser = require('body-parser');
 var User = require('../models/user');
+const user = require('../models/user');
 //const { response } = require('../app');
 
 
@@ -16,34 +17,41 @@ router.get('/', function(req, res, next) {
 
 router.post('/signup', function(req,res,next){ // to register a user, POST op 
 
-  User.findOne({username:req.body.username})
-  .then((user)=>{
-    if(user!=null){
+  //User.findOne({username:req.body.username})
+  // register provided by the mongoose plugin
+  User.register(new User({username:req.body.username}), req.body.password,
+   (err,user)=>
+  {//callback
+    //if(user!=null)
+   if(err) {
       //username already exists
-      var err= new Error('User'+req.body.username+' already exists!');
-      err.status=403; //forbidden
-      next(err);
-    }
-    else{
-      return User.create(
-        {
-          username:req.body.username,
-          password:req.body.password
-        }
-      )// create
-    }
+      res.statusCode=500; // Internal Server Error
+      res.setHeader('Content-type','application/json');
+      res.json({err:err}); // we'll construct a json object with the error as
+      //the value for the error property in there and then send this back.
+      
 
-  }).then((user)=>{ // promise returned from prev then() -after a new user is signed up
-     res.statusCode=200;
-     res.setHeader('Content-type','application/json');
-     res.json({status:'Registration successful', user:user});
-  }, (err)=>next(err))
-    .catch((err)=>next(err));
+    }
+    
+    else{
+     passport.authenticate('local')(req,res, ()=>{
+      res.statusCode=200;
+      res.setHeader('Content-type','application/json');
+      res.json({success:true, status:'Registration completed'});
+
+     });
+    } //else ends here
+  });
 });
 
 //to login a user
-router.post('/login', function(req,res,next){
- // from app.js
+router.post('/login', passport.authenticate('local'), (req,res,next)=>{
+ // if passport.authenticate is success, then only the next func-(req,res,next)- would be executed
+ res.statusCode=200;
+ res.setHeader('Content-type','application/json');
+ res.json({success:true, status:'Logged in!'});
+//router.post('/login', function(req,res,next){
+ /* from app.js
  if(!req.session.user)  
  { // user has not been authorized yet if signed cookie doesn't contain the user property
    // so auth has to be done now
@@ -69,7 +77,7 @@ router.post('/login', function(req,res,next){
        toh semicolon pe firse split mara
  
        so the variable auth is an array 
-       */
+       *//*
    var username=auth[0]; 
    var password=auth[1]; 
 
@@ -116,7 +124,7 @@ router.post('/login', function(req,res,next){
   res.setHeader('Content-type','application/json');
   res.end('You are already authenticated!');
 
- }
+ } */
 });
 //-----------------------
 
@@ -128,6 +136,7 @@ router.get('/logout',(req,res)=>{
     // sessions must exist to logout a user otherwise it does not make any sense
     req.session.destroy();//  info in server side is remove related to the session
     res.clearCookie('session-id'); // cookie named 'session-id' is removed from the client side
+    res.json({success:true, status:'Logged out'})
     res.redirect('/'); // redirecting to homepage
 
   }
