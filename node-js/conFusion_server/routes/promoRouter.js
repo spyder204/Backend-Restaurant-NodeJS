@@ -6,7 +6,7 @@ const promotions=require('../models/promotions');
 const Promotions = require('../models/promotions');
 
 const promoRouter = express.Router();
-
+const authenticate = require('../authenticate');
 promoRouter.use(bodyParser.json());
 
 promoRouter.route('/')
@@ -24,12 +24,12 @@ promoRouter.route('/')
 
 })// get 
 
-.put((req, res, next)=>{
+.put(authenticate.verifyUser, (req, res, next)=>{
   res.statusCode=403;
   res.end('This operation is invalid');
 })
 
-.post((req, res, next)=>{
+.post(authenticate.verifyUser, (req, res, next)=>{
 
   promotions.create(req.body)
   .then((promo)=>{
@@ -42,7 +42,7 @@ promoRouter.route('/')
 
 })//post
 
-.delete((req, res, next)=>{
+.delete(authenticate.verifyUser, (req, res, next)=>{
   //res.end('All promotions deleted!');
   Promotions.remove({})
   .then((response)=>{
@@ -71,7 +71,7 @@ promoRouter.route('/:promoID')
 
 })// get 
 
-.put((req, res, next)=>{
+.put(authenticate.verifyUser, (req, res, next)=>{
   //res.end('updating the promotion '+req.params.promoID+' with new details '+req.body.description);
 
   promotions.findByIdAndUpdate(req.params.promoID,
@@ -95,11 +95,11 @@ promoRouter.route('/:promoID')
 
 })
 
-.post((req, res, next)=>{
+.post(authenticate.verifyUser, (req, res, next)=>{
   res.end('POST operation is invalid on /promotions/'+req.params.promoID);
 })
 
-.delete((req, res, next)=>{
+.delete(authenticate.verifyUser, (req, res, next)=>{
   //res.end(`Promotion Id: ${req.params.promoID}, Name: ${req.body.name}- deleted!`);
   promotions.findByIdAndDelete(req.params.promoID)
   then((promo)=>{

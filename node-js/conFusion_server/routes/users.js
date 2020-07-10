@@ -3,8 +3,9 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 var User = require('../models/user');
 const user = require('../models/user');
-//const { response } = require('../app');
 
+var authenticate = require('../authenticate'); 
+// authenticate.js -- it contains getToken() which we defined earlier
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -45,11 +46,18 @@ router.post('/signup', function(req,res,next){ // to register a user, POST op
 });
 
 //to login a user
-router.post('/login', passport.authenticate('local'), (req,res,next)=>{
- // if passport.authenticate is success, then only the next func-(req,res,next)- would be executed
+router.post('/login', passport.authenticate('local'), (req,res)=>{
+
+// creating token
+var token = authenticate.getToken({_id: req.user._id}); // takes one param only as the payload
+ 
+ 
+  // if passport.authenticate is success, then only the next func-(req,res,next)- would be executed
  res.statusCode=200;
  res.setHeader('Content-type','application/json');
- res.json({success:true, status:'Logged in!'});
+ res.json({success:true, token: token, status:'Logged in!'});// now client will also get the token which can be extracted from the response
+
+
 //router.post('/login', function(req,res,next){
  /* from app.js
  if(!req.session.user)  
