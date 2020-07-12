@@ -20,7 +20,7 @@ dishRouter.route('/')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser, (req, res, next) => {           // for POST req. authenticate.verifyUser would be executed, if success, then callback runs
+.post(authenticate.verifyUser, (req, res, next) => {  // for POST req. authenticate.verifyUser would be executed, if success, then callback runs
     Dishes.create(req.body)
     .then((dish) => {
         console.log('Dish Created ', dish);
