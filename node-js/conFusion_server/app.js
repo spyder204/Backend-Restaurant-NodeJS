@@ -36,7 +36,23 @@ connect.then((db) => {
 
 
 var app = express();
+// to redirect traffic to https
+app.all('*', (req, res, next)=>{ // * means all
 
+  if(req.secure){// if incoming req is already secure, then the req object
+      return (next); // has a flag secure set to true
+  }       
+  
+  else{
+    // redirects incoming req to other url i.e. localhost:3443
+    res.redirect(307, 'https://'+req.hostname+':'+app.get('secPort')+req.url);
+    // 307 - return status code
+    // means that the target resource resides in a different url
+    // user agent must not change the req method that is get, post,etc.
+  }
+
+
+    });
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

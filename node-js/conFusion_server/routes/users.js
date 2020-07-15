@@ -2,7 +2,6 @@ var express  = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 var User = require('../models/user');
-const user = require('../models/user');
 
 var authenticate = require('../authenticate'); 
 // authenticate.js -- it contains getToken() which we defined earlier
@@ -12,8 +11,21 @@ router.use(bodyParser.json());
 
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin ,function(req, res, next) {
+  //  console.log('jesfsfsf');
+    User.find({})
+    .then((err, users)=>{
+      if(err){
+
+
+        return next(err);
+      }
+      res.statusCode=200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(users);
+    }, (err)=>next(err)) // then
+    .catch((err)=>next(err));
+
 });
 
 router.post('/signup', function(req,res,next){ // to register a user, POST op 
@@ -168,7 +180,7 @@ router.get('/logout',(req,res)=>{
   else{
     var err=new Error("You are not logged in.");
     err.status=403;
-    next(err);
+    return next(err);
   }
 }); 
 

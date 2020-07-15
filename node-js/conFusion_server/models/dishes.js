@@ -22,8 +22,10 @@ const commentSchema=new Schema({
 
     },
     author:{
-        type:String,
-        required:true
+        type:mongoose.Schema.Types.ObjectId, 
+        ref:'User'  // reference to the objectId of the User document
+        //type:String,
+        //required:true
     }
 },
     {

@@ -7,6 +7,7 @@ var jwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var jwt= require('jsonwebtoken'); // used to  create, sign and verify tokens.
 const config = require('./config');
+const { NotExtended } = require('http-errors');
 
 
 passport.use(new LocalStrategy(User.authenticate()));
@@ -55,3 +56,14 @@ exports.jwtPassport = passport.use( new jwtStrategy(opts,
 exports.verifyUser = passport.authenticate('jwt', {session:false}); //jwt strategy
 // session:false means we're not going to create sessions as we are using token based auth.
 //user verified using this function
+
+
+exports.verifyAdmin = function(){
+    if(req.body.admin)
+        next();
+    else{
+        var err = new Error('Admin access required!!');
+        err.status = 403;
+        return(next(err));
+    }
+};
