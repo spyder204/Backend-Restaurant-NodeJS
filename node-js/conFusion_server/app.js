@@ -18,6 +18,9 @@ const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 
+const uploadRouter = require('./routes/uploadRouter');
+
+
 // to connect this server with mongoDB now-- first
 const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
@@ -36,6 +39,7 @@ connect.then((db) => {
 
 
 var app = express();
+/* ----------------------------------------    HTTPS
 // to redirect traffic to https
 app.all('*', (req, res, next)=>{ // * means all
 
@@ -53,6 +57,7 @@ app.all('*', (req, res, next)=>{ // * means all
 
 
     });
+    */
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -92,6 +97,7 @@ app.use(express.static(path.join(__dirname, 'public')));// to serve static data 
 app.use('/dishes', dishRouter);         // we are now allowing GET op to be performed without any auth
 app.use('/promotions', promoRouter);    // POST, PUT, DELETE still require auth .
 app.use('/leaders', leaderRouter);      // to do this we have made changes in these routes.
+app.use('/imageUpload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

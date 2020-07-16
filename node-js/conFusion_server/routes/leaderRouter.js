@@ -25,12 +25,12 @@ leaderRouter.route('/')
 
 })// get 
 
-.put(authenticate.verifyUser, (req, res, next)=>{
+.put(authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next)=>{
   res.statusCode=403;
   res.end('This operation is invalid');
 })
 
-.post(authenticate.verifyUser, (req, res, next)=>{
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
 
   leaders.create(req.body)
   .then((leader)=>{
@@ -43,7 +43,7 @@ leaderRouter.route('/')
 
 })//post
 
-.delete(authenticate.verifyUser, (req, res, next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next)=>{
   //res.end('All promotions deleted!');
   leaders.remove({})
   .then((response)=>{
@@ -72,7 +72,7 @@ leaderRouter.route('/:leaderID')
 
 })// get 
 
-.put(authenticate.verifyUser, (req, res, next)=>{
+.put(authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next)=>{
   //res.end('updating the promotion '+req.params.promoID+' with new details '+req.body.description);
 
   leaders.findByIdAndUpdate(req.params.leaderID,
@@ -96,11 +96,11 @@ leaderRouter.route('/:leaderID')
 
 })
 
-.post(authenticate.verifyUser, (req, res, next)=>{
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   res.end('POST operation is invalid on /leaders/'+req.params.leaderID);
 })
 
-.delete(authenticate.verifyUser, (req, res, next)=>{
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   //res.end(`Promotion Id: ${req.params.promoID}, Name: ${req.body.name}- deleted!`);
   leaders.findByIdAndDelete(req.params.leaderID)
   then((leader)=>{

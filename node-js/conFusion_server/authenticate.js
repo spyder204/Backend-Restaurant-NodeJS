@@ -64,6 +64,6 @@ exports.verifyAdmin = function(){
     else{
         var err = new Error('Admin access required!!');
         err.status = 403;
-        return(next(err));
+        return next(err);
     }
 };
