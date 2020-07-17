@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const authenticate = require('../authenticate');
 
 const multer = require('multer');
+const cors = require('./cors');
 
 // multer provides a disk storage function 
 const storage = multer.diskStorage({
@@ -40,20 +41,22 @@ uploadRouter.use(bodyParser.json());
 
 uploadRouter.route('/')
 // allowing only the POST method
+.options(cors.corsWithOption, (req, res)=>{res.sendStatus = 200;})
+
 .get(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.end('GET operation not supported on /imageUpload');
 })
-.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.put(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /imageUpload');
 })
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+.delete(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.end('DELETE operation not supported on /imageUpload');
 })
 
-.post(upload.single('imageFile'),(req, res) => {
+.post(cors.corsWithOption,upload.single('imageFile'),(req, res) => {
     //                          upload function defined above
     //                          which supports the single function to upload a single file
     //                          single() takes as the param the name of the form field
