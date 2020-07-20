@@ -2,7 +2,7 @@ var express  = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 var User = require('../models/user');
-
+const cors = require('./cors');
 var authenticate = require('../authenticate'); 
 // authenticate.js -- it contains getToken() which we defined earlier
 
@@ -11,7 +11,8 @@ router.use(bodyParser.json());
 
 
 /* GET users listing. */
-router.get('/', authenticate.verifyUser, authenticate.verifyAdmin ,function(req, res, next) {
+router.get('/',cors.corsWithOption, authenticate.verifyUser, authenticate.verifyAdmin ,function(req, res, next) {
+  //  get performed by admin so corswithoptions
   //  console.log('jesfsfsf');
     User.find({})
     .then((err, users)=>{
@@ -28,7 +29,7 @@ router.get('/', authenticate.verifyUser, authenticate.verifyAdmin ,function(req,
 
 });
 
-router.post('/signup', function(req,res,next){ // to register a user, POST op 
+router.post('/signup', cors.corsWithOption, function(req,res,next){ // to register a user, POST op 
 
   //User.findOne({username:req.body.username})
   // register provided by the mongoose plugin
@@ -66,15 +67,15 @@ router.post('/signup', function(req,res,next){ // to register a user, POST op
           res.json({success:true, status:'Registration completed'});
     
 
-      })
-    
+      });
      });
     } //else ends here
   });
 });
 
+
 //to login a user
-router.post('/login', passport.authenticate('local'), (req,res)=>{
+router.post('/login', cors.corsWithOption, passport.authenticate('local'), (req,res)=>{
 
 // creating token
 var token = authenticate.getToken({_id: req.user._id}); // takes one param only as the payload
@@ -166,7 +167,7 @@ var token = authenticate.getToken({_id: req.user._id}); // takes one param only 
 
 // doing a GET on logout instead of POST as we don't 
 // need to supply any info so GET is fine.
-router.get('/logout',(req,res)=>{
+router.get('/logout',cors.corsWithOption, (req,res)=>{
 
   if(req.session){
     // sessions must exist to logout a user otherwise it does not make any sense

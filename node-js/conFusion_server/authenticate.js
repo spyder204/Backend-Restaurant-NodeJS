@@ -7,10 +7,10 @@ var jwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var jwt= require('jsonwebtoken'); // used to  create, sign and verify tokens.
 const config = require('./config');
-const { NotExtended } = require('http-errors');
+//const { NotExtended } = require('http-errors');
 
 
-passport.use(new LocalStrategy(User.authenticate()));
+exports.local = passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -53,13 +53,29 @@ exports.jwtPassport = passport.use( new jwtStrategy(opts,
 
     }));  
 
-exports.verifyUser = passport.authenticate('jwt', {session:false}); //jwt strategy
-// session:false means we're not going to create sessions as we are using token based auth.
-//user verified using this function
-
+exports.verifyUser = function (req, res, next) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'];
+        if (token) {
+            jwt.verify(token, config.secretKey, function (err, decoded) {
+                if (err) {
+                    var err = new Error('You are not authenticated!');
+                    err.status = 401;
+                    return next(err);
+                } else {
+                    req.decoded = decoded;
+                    next();
+                }
+            });
+        } else {
+            var err = new Error('No token provided!');
+            err.status = 403;
+            return next(err);
+        }
+    };
+    
 
 exports.verifyAdmin = function(){
-    if(req.body.admin)
+    if(req.decoded._doc.admin == true)//if(req.body.admin)
         next();
     else{
         var err = new Error('Admin access required!!');

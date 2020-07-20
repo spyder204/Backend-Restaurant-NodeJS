@@ -7,11 +7,12 @@ const Promotions = require('../models/promotions');
 
 const promoRouter = express.Router();
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 promoRouter.use(bodyParser.json());
 
 promoRouter.route('/')
-
-.get((req, res, next)=>{
+.options(cors.corsWithOption, (req, res)=>{res.sendStatus = 200;})
+.get(cors.cors,(req, res, next)=>{
 
   promotions.find({})
   .then((promos)=>{
@@ -24,12 +25,12 @@ promoRouter.route('/')
 
 })// get 
 
-.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.put(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   res.statusCode=403;
   res.end('This operation is invalid');
 })
 
-.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.post(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
 
   promotions.create(req.body)
   .then((promo)=>{
@@ -42,7 +43,7 @@ promoRouter.route('/')
 
 })//post
 
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.delete(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   //res.end('All promotions deleted!');
   Promotions.remove({})
   .then((response)=>{
@@ -56,8 +57,8 @@ promoRouter.route('/')
 });
 
 promoRouter.route('/:promoID')
-
-.get((req, res, next)=>{
+.options(cors.corsWithOption, (req, res)=>{res.sendStatus = 200;})
+.get(cors.cors,(req, res, next)=>{
   console.log("Fetching promotion\n");
   promotions.findById(req.params.promoID)
   .then((promo)=>{
@@ -71,7 +72,7 @@ promoRouter.route('/:promoID')
 
 })// get 
 
-.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.put(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   //res.end('updating the promotion '+req.params.promoID+' with new details '+req.body.description);
 
   promotions.findByIdAndUpdate(req.params.promoID,
@@ -95,11 +96,11 @@ promoRouter.route('/:promoID')
 
 })
 
-.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.post(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   res.end('POST operation is invalid on /promotions/'+req.params.promoID);
 })
 
-.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.delete(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   //res.end(`Promotion Id: ${req.params.promoID}, Name: ${req.body.name}- deleted!`);
   promotions.findByIdAndDelete(req.params.promoID)
   then((promo)=>{

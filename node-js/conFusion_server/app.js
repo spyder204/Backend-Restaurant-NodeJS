@@ -17,8 +17,10 @@ var usersRouter = require('./routes/users');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
-
 const uploadRouter = require('./routes/uploadRouter');
+
+
+const favoriteRouter = require('./routes/favoriteRouter');
 
 
 // to connect this server with mongoDB now-- first
@@ -38,7 +40,20 @@ connect.then((db) => {
 });
 
 
-var app = express();
+var app = express(); 
+app.all('*', (req, res,next)=>{  //all requests will be redirected
+
+  if(req.secure) // if incoming req is already secure
+  { 
+    return next();
+  }
+  else
+  {
+    res.redirect(307, 'https://'+req.hostname+':'+app.get('secPort')+req.url);
+  }
+
+
+}); 
 /* ----------------------------------------    HTTPS
 // to redirect traffic to https
 app.all('*', (req, res, next)=>{ // * means all
@@ -98,6 +113,7 @@ app.use('/dishes', dishRouter);         // we are now allowing GET op to be perf
 app.use('/promotions', promoRouter);    // POST, PUT, DELETE still require auth .
 app.use('/leaders', leaderRouter);      // to do this we have made changes in these routes.
 app.use('/imageUpload', uploadRouter);
+app.use('/favorite', favoriteRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

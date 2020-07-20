@@ -6,13 +6,14 @@ const leaders = require('../models/leaders');
 
 const leaderRouter = express.Router();
 const authenticate = require('../authenticate');
-
+const cors = require('./cors');
 leaderRouter.use(bodyParser.json());
 
 
 
 leaderRouter.route('/')
-.get((req, res, next)=>{
+.options(cors.corsWithOption, (req, res)=>{res.sendStatus = 200;})
+.get(cors.cors, (req, res, next)=>{
 
   leaders.find({})
   .then((leader)=>{
@@ -25,12 +26,12 @@ leaderRouter.route('/')
 
 })// get 
 
-.put(authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next)=>{
+.put(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next)=>{
   res.statusCode=403;
   res.end('This operation is invalid');
 })
 
-.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.post(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
 
   leaders.create(req.body)
   .then((leader)=>{
@@ -43,7 +44,7 @@ leaderRouter.route('/')
 
 })//post
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next)=>{
+.delete(cors.corsWithOption,authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next)=>{
   //res.end('All promotions deleted!');
   leaders.remove({})
   .then((response)=>{
@@ -57,8 +58,8 @@ leaderRouter.route('/')
 });
 
 leaderRouter.route('/:leaderID')
-
-.get((req, res, next)=>{
+.options(cors.corsWithOption, (req, res)=>{res.sendStatus = 200;})
+.get(cors.cors, (req, res, next)=>{
   console.log("Fetching leader info\n");
   leaders.findById(req.params.leaderID)
   .then((leader)=>{
@@ -72,7 +73,7 @@ leaderRouter.route('/:leaderID')
 
 })// get 
 
-.put(authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next)=>{
+.put(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next)=>{
   //res.end('updating the promotion '+req.params.promoID+' with new details '+req.body.description);
 
   leaders.findByIdAndUpdate(req.params.leaderID,
@@ -96,14 +97,14 @@ leaderRouter.route('/:leaderID')
 
 })
 
-.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
+.post(cors.corsWithOption,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   res.end('POST operation is invalid on /leaders/'+req.params.leaderID);
 })
 
 .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next)=>{
   //res.end(`Promotion Id: ${req.params.promoID}, Name: ${req.body.name}- deleted!`);
   leaders.findByIdAndDelete(req.params.leaderID)
-  then((leader)=>{
+  .then((leader)=>{
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json(leader);
