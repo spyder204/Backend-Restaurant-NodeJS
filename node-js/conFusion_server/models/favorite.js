@@ -5,8 +5,6 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
 const Schema = mongoose.Schema;
-require('mongoose-currency').loadType(mongoose);
-
 
 const favoriteArray = new Schema({
 

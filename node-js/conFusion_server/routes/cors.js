@@ -8,11 +8,11 @@ const whitelist = ['https://localhost:3000', 'https://localhost:3443'];
 var corsOptionsDelegate = (req, callback)=>{
   
     var corsOptions;
-    if(whitelist.indexOf(req.header('Origin'))){
+    if(whitelist.indexOf(req.header('Origin'))!==-1){
     //if incoming header contains an 'origin' field
         corsOptions = { origin: true };
          // means incoming origin is in the whitelist
-         // client side will be informed that it is ok for the server to
+         // client side will be informed that it is ok for the server tos
          // accept this request for this specific origin
 
     }

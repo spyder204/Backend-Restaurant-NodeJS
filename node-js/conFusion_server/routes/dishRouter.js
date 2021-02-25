@@ -16,7 +16,7 @@ dishRouter.route('/')
 // for preflight req.s , client will first send HTTP options msg, then we'll respond as- 
 .options(cors.corsWithOption, (req, res)=>{res.sendStatus = 200;})
 .get(cors.cors, (req,res,next) => {  //cors middleware added
-    Dishes.find({}).populate('comments.author')
+    Dishes.find(req.query).populate('comments.author')
     .then((dishes) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');

@@ -10,6 +10,8 @@ var router = express.Router();
 router.use(bodyParser.json());
 
 
+router.options('*', cors.corsWithOption, (req, res)=>{res.sendStatus(200);})
+
 /* GET users listing. */
 router.get('/',cors.corsWithOption, authenticate.verifyUser, authenticate.verifyAdmin ,function(req, res, next) {
   //  get performed by admin so corswithoptions
@@ -75,17 +77,34 @@ router.post('/signup', cors.corsWithOption, function(req,res,next){ // to regist
 
 
 //to login a user
-router.post('/login', cors.corsWithOption, passport.authenticate('local'), (req,res)=>{
+//router.post('/login', cors.corsWithOption, passport.authenticate('local'), (req,res)=>{
+  router.post('/login', cors.corsWithOption, (req,res,next)=>{
+    passport.authenticate('local', (err, user, info)=>{
+      if(err)
+        return next(err);
+      if(!user){   // if username or password is incorrect
+        res.statusCode=401;
+        res.setHeader('Content-type','application/json');
+        res.json({success:false, status:'Unable to log in!', err:info});
+      }
+      req.logIn(user, (err)=>{ // method login added by passport.authenticate
+          if(err) {
+            res.statusCode=401;
+            res.setHeader('Content-type','application/json');
+            res.json({success:false, status:'Unable to log in!', err:info});
+          }
+          var token = authenticate.getToken({_id: req.user._id});
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({success: true, status: 'Login Successful!', token: token})  
 
-// creating token
-var token = authenticate.getToken({_id: req.user._id}); // takes one param only as the payload
- 
- 
-  // if passport.authenticate is success, then only the next func-(req,res,next)- would be executed
- res.statusCode=200;
- res.setHeader('Content-type','application/json');
- res.json({success:true, token: token, status:'Logged in!'});// now client will also get the token which can be extracted from the response
 
+
+        });
+    })(req, res, next);//passport
+    // did this above as passport.authenticate doesnt show much info when user is not logged in- just shows unauthorized
+
+  });
 
 //router.post('/login', function(req,res,next){
  /* from app.js
@@ -161,8 +180,8 @@ var token = authenticate.getToken({_id: req.user._id}); // takes one param only 
   res.setHeader('Content-type','application/json');
   res.end('You are already authenticated!');
 
- } */
-});
+ } 
+});*/
 //-----------------------
 
 // doing a GET on logout instead of POST as we don't 
